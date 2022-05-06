@@ -1,11 +1,15 @@
 Package: proteasy
 Type: Package
-Title: What the Package Does (Title Case)
+Title: Protease Activity Mapping
 Version: 0.1.0
-Author: Who wrote it
-Maintainer: The package maintainer <yourself@somewhere.net>
-Description: More about what it does (maybe more than one line)
-    Use four spaces when indenting paragraphs within the Description.
-License: What license is it under?
+Author: Martin Rydén
+Maintainer: Martin Rydén <martin.ryden@med.lu.se>
+Description: Finds proteases (based on literature) acting on cleavage sites.
+Depends: R (>= 3.1.1), data.table, stringr
+License: GNU General Public License v3.0
 Encoding: UTF-8
 LazyData: true
+RoxygenNote: 7.1.2
+Imports: 
+    data.table,
+    stringr
