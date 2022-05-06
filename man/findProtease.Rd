@@ -4,27 +4,28 @@
 \alias{findProtease}
 \title{Find Proteases}
 \usage{
-findProtease(peptide, protein)
+findProtease(protein, peptide, organism, start_pos, end_pos)
 }
 \arguments{
 \item{protein}{a vector of corresponding UniProt Accession IDs}
 
 \item{peptide}{a vector of amino acid sequences}
 
+\item{organism}{name of organism}
+
 \item{start_pos}{(optional) vector of N-terminus position in protein sequence}
 
 \item{end_pos}{(optional) vector of C-terminus position in protein sequence}
-
-\item{organism}{name of organism}
 }
 \value{
-S4 object proteasy_res
+S4 object Cleavages
 }
 \description{
 Given a vector of peptides and proteins, finds proteases acting on cleavage sites
 }
 \examples{
-protein <- c('P00450','P05387','P80297')
-peptide <- c('AEEIIWNYAPSGIDIFTK','APGSAAPAAGSAPAAAEEK','CAGSCKCKECKCTSCKKSCCSCCPVGCAKCAQG')
+protein <- c("P02671", "P02671", "P68871", "P01011")
+peptide <- c("FEEVSGNVSPGTR", "FVSETESR", "LLVVYPW", "ITLLSAL")
+res <- findProtease(protein = protein, peptide = peptide, organism = "Homo sapiens")
 
 }
