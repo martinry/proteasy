@@ -9,9 +9,8 @@
 #' @param start_pos  (optional) vector of N-terminus position in protein sequence
 #' @param end_pos  (optional) vector of C-terminus position in protein sequence
 #'
-#' @import data.table
+#' @include Classes.R Generics.R Methods.R helper-functions.R
 #'
-#' @include AllClasses.R methods.R helper-functions.R
 #'
 #' @return S4 object Cleavages
 #'
@@ -21,12 +20,15 @@
 #' res <- findProtease(protein = protein, peptide = peptide, organism = "Homo sapiens")
 #'
 #' @export
+#'
+#' @importFrom data.table data.table setkeyv
 
 findProtease <- function(protein, peptide, organism = "Homo sapiens", start_pos, end_pos) {
 
     # Define local variables as NULL (due to non-standard evaluation in data.table)
     uniprot_id <- seq_name <- Uniprot <- Organism <- Status <- .N <- NULL
 
+    # Internal data: MEROPS Substrate_search.sql and Uniprot ID to MEROPS identifier mapping
     mer <- get0("mer", envir = asNamespace("proteasy"))
     merops_map <- get0("merops_map", envir = asNamespace("proteasy"))
 
@@ -35,70 +37,40 @@ findProtease <- function(protein, peptide, organism = "Homo sapiens", start_pos,
 
     if((missing(start_pos) | missing(end_pos))) {
 
-        unique_proteins <- unique(protein)
+        # Find start_pos and end_pos by mapping peptide against protein sequence
 
         if(!(organism %in% c("Homo sapiens", "Rattus norvegicus", "Mus musculus"))) {
-
-            # Retrieve sequences using Rcpi
-            proteome <- Rcpi::getSeqFromUniProt( unique_proteins, parallel = 5)
-
-            proteome <-
-                data.table::as.data.table(t(mapply(
-                    proteome,
-                    FUN = function(x)
-                        data.table::data.table(seq_name = as.character(sub(
-                            "\\|.*", "", sub(".*\\|(.*)\\|.*", "\\1", names(x)))
-                        ), sequence = as.character(x[[1]]))
-                )))
+            # Rcpi method
+            p <- getSeqData(method = "Rcpi", protein = protein, organism = organism)
 
         } else {
-            proteome <- switch(organism,
-                               "Homo sapiens" = EnsDb.Hsapiens.v86::EnsDb.Hsapiens.v86,
-                               "Mus musculus" = EnsDb.Mmusculus.v79::EnsDb.Mmusculus.v79,
-                               "Rattus norvegicus" = EnsDb.Mmusculus.v79::EnsDb.Mmusculus.v79)
-
-            proteome <-
-                data.table::as.data.table(
-                    ensembldb::proteins(
-                        proteome,
-                        filter = AnnotationFilter::UniprotFilter(protein),
-                        columns = c("uniprot_id", "protein_sequence"),
-                        return.type = "data.frame"
-                    )
-                )
-
-            proteome <- data.table::setnames(x = proteome,
-                                             old = c("uniprot_id", "protein_sequence"),
-                                             new = c("seq_name", "sequence"))
-
-            proteome <- proteome[!BiocGenerics::duplicated(proteome$seq_name), 1:2]
-
+            # ensembldb method
+            p <- getSeqData(method = "ensembldb", protein = protein, organism = organism)
         }
 
-        # List proteins not found
-        unmapped <- unique_proteins[!(unique_proteins %in% proteome$seq_name)]
+        unique_proteins <- unique(protein)
+
+        # Proteins where sequence data was not found
+        unmapped <- unique_proteins[!(unique_proteins %in% p$seq_name)]
 
         if(length(unmapped) == length(unique_proteins)) stop("No accessions could be mapped.")
 
         if(length(unmapped) > 0) {
-            warning(
-                paste0(
-                    "Some protein accessions could not be mapped (",
-                    length(unmapped),
-                    "). This could be due to use of obsolete accessions or incorrect identifier type. ",
-                    paste0(unmapped, collapse = ", ")
+            warning(paste0(
+                "Some protein accessions could not be mapped (", length(unmapped),
+                "). This could be due to use of obsolete accessions or incorrect identifier type. ",
+                paste0(unmapped, collapse = ", "))
                 )
-            )
-        }
+            }
 
-        proteome <- proteome[proteome$seq_name %in% unique_proteins,]
+        p <- p[seq_name %in% unique_proteins,]
 
         input <- unique(data.table::data.table(protein, peptide))
 
-        data.table::setkeyv(proteome, "seq_name")
+        data.table::setkeyv(p, "seq_name")
         data.table::setkeyv(input, "protein")
 
-        input <- proteome[input]
+        input <- p[input]
 
         str_pos <- data.table::as.data.table(stringr::str_locate(input$sequence, input$peptide))
 
@@ -112,24 +84,9 @@ findProtease <- function(protein, peptide, organism = "Homo sapiens", start_pos,
         input <- data.table::data.table(protein, peptide, start_pos, end_pos)
     }
 
-    mer <- mer[organism == organism]
-    mer <- mer[Uniprot %in% unique_proteins]
+    mer <- mer[organism == organism & Uniprot %in% unique_proteins]
 
-    # Find N-terminus matches
-    data.table::setkeyv(input, c("protein", "start_pos"))
-    data.table::setkeyv(mer, c("Uniprot", "resnum"))
-    N <- input[mer, nomatch = NULL]
-    N$terminus <- "N"
-
-    # Find C-terminus matches
-    data.table::setkeyv(input, c("protein", "end_pos"))
-    data.table::setkeyv(mer, c("Uniprot", "resnum"))
-    C <- input[mer, nomatch = NULL]
-    C$terminus <- "C"
-
-    if(N[, .N] == 0 & C[, .N] == 0) stop("No matches found.")
-
-    r <- data.table::rbindlist(list(N, C))
+    r <- matchTermini(input)
 
     merops_map <- merops_map[startsWith(Organism, organism)]
 
@@ -159,13 +116,13 @@ findProtease <- function(protein, peptide, organism = "Homo sapiens", start_pos,
                   "Cleavage type",          # 15
                   "Cleaved terminus")       # 16
 
-    substrate <- data.table::data.table("Substrate name"      = r[, 12][[1]],
-                                        "Substrate (Uniprot)" = r[, 6][[1]],
-                                        "Substrate sequence"  = r[, 7][[1]],
-                                        "Substrate length"    = nchar(r[, 7][[1]]),
-                                        "Peptide"             = r[, 8][[1]],
-                                        "Start position"      = r[, 9][[1]],
-                                        "End position"        = r[, 10][[1]])
+    substrate <- data.table::data.table("Substrate name"       = r[, 12][[1]],
+                                        "Substrate (Uniprot)"  = r[, 6][[1]],
+                                        "Substrate sequence"   = r[, 7][[1]],
+                                        "Substrate length"     = nchar(r[, 7][[1]]),
+                                        "Peptide"              = r[, 8][[1]],
+                                        "Start position"       = r[, 9][[1]],
+                                        "End position"         = r[, 10][[1]])
 
     protease <- data.table::data.table("Protease name"         = r[, 14][[1]],
                                        "Protease (Uniprot)"    = r[, 1][[1]],
@@ -174,13 +131,13 @@ findProtease <- function(protein, peptide, organism = "Homo sapiens", start_pos,
                                        "Protease (MEROPS)"     = r[, 5][[1]],
                                        "Protease URL"          = paste0("https://www.ebi.ac.uk/merops/cgi-bin/pepsum?id=", r[, 5][[1]]))
 
-    cleavage <- data.table::data.table("Substrate (Uniprot)" = r[, 6][[1]],
-                                        "Peptide"            = r[, 8][[1]],
-                                        "Protease (Uniprot)" = r[, 1][[1]],
-                                        "Protease status"    = r[, 2][[1]],
-                                        "Cleaved residue"    = r[, 11][[1]],
-                                        "Cleaved terminus"   = r[, 16][[1]],
-                                        "Cleavage type"      = r[, 15][[1]])
+    cleavage <- data.table::data.table("Substrate (Uniprot)"   = r[, 6][[1]],
+                                        "Peptide"              = r[, 8][[1]],
+                                        "Protease (Uniprot)"   = r[, 1][[1]],
+                                        "Protease status"      = r[, 2][[1]],
+                                        "Cleaved residue"      = r[, 11][[1]],
+                                        "Cleaved terminus"     = r[, 16][[1]],
+                                        "Cleavage type"        = r[, 15][[1]])
 
 
     return(

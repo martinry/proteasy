@@ -1,6 +1,80 @@
-orgDB <- function(s) {
-    switch(s,
-           "Homo sapiens" = EnsDb.Hsapiens.v86::EnsDb.Hsapiens.v86,
-           "Mus musculus" = EnsDb.Mmusculus.v79::EnsDb.Mmusculus.v79,
-           "Rattus norvegicus" = EnsDb.Mmusculus.v79::EnsDb.Mmusculus.v79)
+##***********************************************************************
+##
+##     proteasy helper functions for internal use
+##
+##***********************************************************************
+
+#########################################################################
+###
+### Retrieve sequence data
+##
+
+getSeqData <- function(method, protein, organism) {
+
+    if(method == "Rcpi") {
+
+        # Rcpi method
+        p <- Rcpi::getSeqFromUniProt( unique(protein), parallel = 5)
+
+        p <- data.table::as.data.table(t(
+            vapply(p, FUN.VALUE = data.table::data.table("x", "y"),
+                   FUN = function(x) data.table::data.table(seq_name = as.character(
+                       sub("\\|.*", "",
+                           sub(".*\\|(.*)\\|.*", "\\1",
+                               names(x)))), sequence = as.character(x[[1]]))
+            )))
+
+    } else if(method == "ensembldb") {
+
+        # ensembldb method
+        p <- switch(organism,
+                    "Homo sapiens" = EnsDb.Hsapiens.v86::EnsDb.Hsapiens.v86,
+                    "Mus musculus" = EnsDb.Mmusculus.v79::EnsDb.Mmusculus.v79,
+                    "Rattus norvegicus" = EnsDb.Mmusculus.v79::EnsDb.Mmusculus.v79)
+
+        p <- data.table::as.data.table(
+            ensembldb::proteins(p,
+                                filter = AnnotationFilter::UniprotFilter(protein),
+                                columns = c("uniprot_id", "protein_sequence"),
+                                return.type = "data.frame"))
+
+        p <- data.table::setnames(x = p,
+                                  old = c("uniprot_id", "protein_sequence"),
+                                  new = c("seq_name", "sequence"))
+
+        p <- p[!BiocGenerics::duplicated(p$seq_name), 1:2]
+
+    }
+
+    return(p)
+
 }
+
+#########################################################################
+###
+### Match N/C termini between user input and MEROPS db
+##
+
+matchTermini <- function(input) {
+
+    # Find N-terminus matches
+    data.table::setkeyv(input, c("protein", "start_pos"))
+    data.table::setkeyv(mer, c("Uniprot", "resnum"))
+    N <- input[mer, nomatch = NULL]
+    N$terminus <- "N"
+
+    # Find C-terminus matches
+    data.table::setkeyv(input, c("protein", "end_pos"))
+    data.table::setkeyv(mer, c("Uniprot", "resnum"))
+    C <- input[mer, nomatch = NULL]
+    C$terminus <- "C"
+
+    if(N[, .N] == 0 & C[, .N] == 0) stop("No matches found.", call. = FALSE)
+
+    r <- data.table::rbindlist(list(N, C))
+
+    return(r)
+
+
+}
+

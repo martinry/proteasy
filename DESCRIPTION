@@ -4,12 +4,10 @@ Title: Protease Mapping
 Version: 0.1.0
 Author: Martin Rydén
 Maintainer: Martin Rydén <martin.ryden@med.lu.se>
-Description: Finds proteases acting on cleavage sites based on the MEROPS database.
-Depends: R (>= 3.1.1), data.table
-License: GPL-3 + file LICENSE
-Encoding: UTF-8
-RoxygenNote: 7.1.2
+URL: https://github.com/martinry/proteasy
+BugReports: https://github.com/martinry/proteasy/issues
 Imports:
+    data.table,
     stringr,
     ensembldb,
     AnnotationFilter,
@@ -20,9 +18,16 @@ Imports:
     Rcpi,
     methods,
     utils
+Depends:
+    R (>= 3.5.0)
+Description: Finds proteases acting on cleavage sites based on the MEROPS database.
+License: GPL-3 + file LICENSE
+Encoding: UTF-8
+RoxygenNote: 7.1.2
 Collate: 
-    'AllClasses.R'
+    'Classes.R'
+    'Generics.R'
+    'Methods.R'
     'browseProtease.R'
     'helper-functions.R'
-    'methods.R'
     'findProtease.R'
