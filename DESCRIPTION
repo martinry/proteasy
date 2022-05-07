@@ -5,15 +5,15 @@ Version: 0.1.0
 Author: Martin Rydén
 Maintainer: Martin Rydén <martin.ryden@med.lu.se>
 Description: Finds proteases acting on cleavage sites based on the MEROPS database.
-Depends: R (>= 3.1.1)
+Depends: R (>= 3.1.1), data.table
 License: GPL-3 + file LICENSE
 Encoding: UTF-8
 RoxygenNote: 7.1.2
 Imports:
-    data.table,
     stringr,
     ensembldb,
     AnnotationFilter,
+    BiocGenerics,
     EnsDb.Hsapiens.v86,
     EnsDb.Mmusculus.v79,
     EnsDb.Rnorvegicus.v79,

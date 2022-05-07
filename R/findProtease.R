@@ -9,6 +9,8 @@
 #' @param start_pos  (optional) vector of N-terminus position in protein sequence
 #' @param end_pos  (optional) vector of C-terminus position in protein sequence
 #'
+#' @import data.table
+#'
 #' @include AllClasses.R methods.R helper-functions.R
 #'
 #' @return S4 object Cleavages
@@ -50,7 +52,10 @@ findProtease <- function(protein, peptide, organism = "Homo sapiens", start_pos,
                 )))
 
         } else {
-            proteome <- orgDB(organism)
+            proteome <- switch(organism,
+                               "Homo sapiens" = EnsDb.Hsapiens.v86::EnsDb.Hsapiens.v86,
+                               "Mus musculus" = EnsDb.Mmusculus.v79::EnsDb.Mmusculus.v79,
+                               "Rattus norvegicus" = EnsDb.Mmusculus.v79::EnsDb.Mmusculus.v79)
 
             proteome <-
                 data.table::as.data.table(
@@ -62,13 +67,18 @@ findProtease <- function(protein, peptide, organism = "Homo sapiens", start_pos,
                     )
                 )
 
-            proteome <- proteome[!duplicated(uniprot_id), 1:2]
-            names(proteome) <- c("seq_name", "sequence")
+            proteome <- data.table::setnames(x = proteome,
+                                             old = c("uniprot_id", "protein_sequence"),
+                                             new = c("seq_name", "sequence"))
+
+            proteome <- proteome[!BiocGenerics::duplicated(proteome$seq_name), 1:2]
 
         }
 
         # List proteins not found
         unmapped <- unique_proteins[!(unique_proteins %in% proteome$seq_name)]
+
+        if(length(unmapped) == length(unique_proteins)) stop("No accessions could be mapped.")
 
         if(length(unmapped) > 0) {
             warning(
@@ -81,12 +91,12 @@ findProtease <- function(protein, peptide, organism = "Homo sapiens", start_pos,
             )
         }
 
-        proteome <- proteome[seq_name %in% unique_proteins]
+        proteome <- proteome[proteome$seq_name %in% unique_proteins,]
 
         input <- unique(data.table::data.table(protein, peptide))
 
-        data.table::setkey(proteome, "seq_name")
-        data.table::setkey(input, "protein")
+        data.table::setkeyv(proteome, "seq_name")
+        data.table::setkeyv(input, "protein")
 
         input <- proteome[input]
 
@@ -119,72 +129,69 @@ findProtease <- function(protein, peptide, organism = "Homo sapiens", start_pos,
 
     if(N[, .N] == 0 & C[, .N] == 0) stop("No matches found.")
 
-    res <- data.table::rbindlist(list(N, C))
+    r <- data.table::rbindlist(list(N, C))
 
     merops_map <- merops_map[startsWith(Organism, organism)]
 
-    data.table::setkey(res, "code")
+    data.table::setkey(r, "code")
     data.table::setkey(merops_map, "Cross-reference (MEROPS)")
 
-    res2 <- merops_map[res, nomatch = NULL]
+    r <- merops_map[r, nomatch = NULL]
 
-    res2 <- res2[order(Status, decreasing = F)]
+    r <- r[order(Status, decreasing = F)]
 
-    res2 <- res2[!duplicated(res2[, c("peptide", "protein", "Entry", "Cross-reference (MEROPS)", "terminus", "cleavage_type")])]
+    r <- r[!duplicated(r[, c("peptide", "protein", "Entry", "Cross-reference (MEROPS)", "terminus", "cleavage_type")])]
 
-    names(res2) <-
-        c(
-            "Protease (Uniprot)",
-            "Protease status",
-            "Protease (Gene names)",
-            "Organism",
-            "Protease (MEROPS)",
-            "Substrate (Uniprot)",
-            "Substrate sequence",
-            "Peptide",
-            "Start position",
-            "End position",
-            "Cleaved residue",
-            "Substrate name",
-            "organism",
-            "Protease name",
-            "Cleavage type",
-            "Cleaved terminus"
+    names(r) <- c("Protease (Uniprot)",     # 1
+                  "Protease status",        # 2
+                  "Protease (Gene names)",  # 3
+                  "Organism",               # 4
+                  "Protease (MEROPS)",      # 5
+                  "Substrate (Uniprot)",    # 6
+                  "Substrate sequence",     # 7
+                  "Peptide",                # 8
+                  "Start position",         # 9
+                  "End position",           # 10
+                  "Cleaved residue",        # 11
+                  "Substrate name",         # 12
+                  "organism",               # 13
+                  "Protease name",          # 14
+                  "Cleavage type",          # 15
+                  "Cleaved terminus")       # 16
+
+    substrate <- data.table::data.table("Substrate name"      = r[, 12][[1]],
+                                        "Substrate (Uniprot)" = r[, 6][[1]],
+                                        "Substrate sequence"  = r[, 7][[1]],
+                                        "Substrate length"    = nchar(r[, 7][[1]]),
+                                        "Peptide"             = r[, 8][[1]],
+                                        "Start position"      = r[, 9][[1]],
+                                        "End position"        = r[, 10][[1]])
+
+    protease <- data.table::data.table("Protease name"         = r[, 14][[1]],
+                                       "Protease (Uniprot)"    = r[, 1][[1]],
+                                       "Protease status"       = r[, 2][[1]],
+                                       "Protease (Gene names)" = r[, 3][[1]],
+                                       "Protease (MEROPS)"     = r[, 5][[1]],
+                                       "Protease URL"          = paste0("https://www.ebi.ac.uk/merops/cgi-bin/pepsum?id=", r[, 5][[1]]))
+
+    cleavage <- data.table::data.table("Substrate (Uniprot)" = r[, 6][[1]],
+                                        "Peptide"            = r[, 8][[1]],
+                                        "Protease (Uniprot)" = r[, 1][[1]],
+                                        "Protease status"    = r[, 2][[1]],
+                                        "Cleaved residue"    = r[, 11][[1]],
+                                        "Cleaved terminus"   = r[, 16][[1]],
+                                        "Cleavage type"      = r[, 15][[1]])
+
+
+    return(
+        methods::new(
+            Class = "Cleavages",
+            organism       = organism,
+            substrate      = unique(substrate),
+            protease       = unique(protease),
+            cleavage       = cleavage
         )
-
-    substrate <- data.table::data.table("Substrate name" = res2$`Substrate name`,
-                            "Substrate (Uniprot)" = res2$`Substrate (Uniprot)`,
-                            "Substrate sequence" = res2$`Substrate sequence`,
-                            "Substrate length" = nchar(res2$`Substrate sequence`),
-                            "Peptide" = res2$Peptide,
-                            "Start position" = res2$`Start position`,
-                            "End position" = res2$`End position`)
-
-    protease <- data.table::data.table("Protease name" = res2$`Protease name`,
-                           "Protease (Uniprot)" = res2$`Protease (Uniprot)`,
-                           "Protease status" = res2$`Protease status`,
-                           "Protease (Gene names)" = res2$`Protease (Gene names)`,
-                           "Protease (MEROPS)" = res2$`Protease (MEROPS)`,
-                           "Protease URL" = paste0("https://www.ebi.ac.uk/merops/cgi-bin/pepsum?id=", res2$`Protease (MEROPS)`))
-
-    cleavage <- data.table::data.table("Substrate (Uniprot)" = res2$`Substrate (Uniprot)`,
-                         "Peptide" = res2$Peptide,
-                         "Protease (Uniprot)" = res2$`Protease (Uniprot)`,
-                         "Protease status" = res2$`Protease status`,
-                         "Cleaved residue" = res2$`Cleaved residue`,
-                         "Cleaved terminus" = res2$`Cleaved terminus`,
-                         "Cleavage type" = res2$`Cleavage type`
-                         )
-
-
-    res <- methods::new(
-        Class = "Cleavages",
-        organism       = organism,
-        substrate      = unique(substrate),
-        protease       = unique(protease),
-        cleavage       = cleavage
     )
 
-    return(res)
 }
 

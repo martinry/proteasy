@@ -16,7 +16,7 @@
 browseProtease <- function(p, keytype = "UniprotID") {
 
     # Define local variables as NULL (due to non-standard evaluation in data.table)
-    Entry <- seq_name <- Uniprot <- Organism <- Status <- .N <- NULL
+    Entry <- NULL
 
     merops_map <- get0("merops_map", envir = asNamespace("proteasy"))
 
