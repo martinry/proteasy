@@ -16,16 +16,16 @@
 browseProtease <- function(p, keytype = "UniprotID") {
 
     # Define local variables as NULL (due to non-standard evaluation in data.table)
-    Entry <- NULL
+    `Protease (Uniprot)` <- `Protease (MEROPS)` <- NULL
 
     merops_map <- get0("merops_map", envir = asNamespace("proteasy"))
 
     if(keytype == "UniprotID"){
-        if(!(p %in% merops_map$Entry)) stop("Identified not recognized.")
+        if(!(p %in% merops_map$`Protease (Uniprot)`)) stop("Identified not recognized.")
 
-        p <- merops_map[Entry == p]$`Cross-reference (MEROPS)`
+        p <- merops_map[`Protease (Uniprot)` == p]$`Protease (MEROPS)`
     } else if(keytype == "MEROPS") {
-        if(!(p %in% merops_map$`Cross-reference (MEROPS)`)) stop("Identified not recognized.")
+        if(!(p %in% merops_map$`Protease (MEROPS)`)) stop("Identified not recognized.")
     } else {
         stop('Not a valid keytype. Valid keytypes are "UniprotID" and "MEROPS".')
     }

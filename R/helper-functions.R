@@ -57,15 +57,17 @@ getSeqData <- function(method, protein, organism) {
 
 matchTermini <- function(input) {
 
+    .N <- NULL
+
     # Find N-terminus matches
     data.table::setkeyv(input, c("protein", "start_pos"))
-    data.table::setkeyv(mer, c("Uniprot", "resnum"))
+    data.table::setkeyv(mer, c("Substrate (Uniprot)", "Residue number"))
     N <- input[mer, nomatch = NULL]
     N$terminus <- "N"
 
     # Find C-terminus matches
     data.table::setkeyv(input, c("protein", "end_pos"))
-    data.table::setkeyv(mer, c("Uniprot", "resnum"))
+    data.table::setkeyv(mer, c("Substrate (Uniprot)", "Residue number"))
     C <- input[mer, nomatch = NULL]
     C$terminus <- "C"
 
@@ -78,3 +80,26 @@ matchTermini <- function(input) {
 
 }
 
+
+#########################################################################
+###
+### Map MEROPS ID to Uniprot
+##
+
+mapMEROPSIDs <- function(r) {
+
+    seq_name <- .N <- `Protease organism` <- `Protease status` <- NULL
+
+    merops_map <- merops_map[`Protease organism` %in% r$`Substrate organism`]
+
+    data.table::setkey(r, "Protease (MEROPS)")
+    data.table::setkey(merops_map, "Protease (MEROPS)")
+
+    r <- merops_map[r, nomatch = NULL]
+
+    r <- r[order(`Protease status`, decreasing = F)]
+
+
+    return(r)
+
+}

@@ -6,6 +6,8 @@ Author: Martin Rydén
 Maintainer: Martin Rydén <martin.ryden@med.lu.se>
 URL: https://github.com/martinry/proteasy
 BugReports: https://github.com/martinry/proteasy/issues
+Depends:
+    R (>= 3.5.0)
 Imports:
     data.table,
     stringr,
@@ -18,10 +20,13 @@ Imports:
     Rcpi,
     methods,
     utils
-Depends:
-    R (>= 3.5.0)
+Suggests:
+    BiocStyle,
+    knitr,
+    rmarkdown
 Description: Finds proteases acting on cleavage sites based on the MEROPS database.
 License: GPL-3 + file LICENSE
+VignetteBuilder: knitr
 Encoding: UTF-8
 RoxygenNote: 7.1.2
 Collate: 
@@ -31,3 +36,5 @@ Collate:
     'browseProtease.R'
     'helper-functions.R'
     'findProtease.R'
+    'showProtease.R'
+    'showSubstrate.R'

@@ -2,12 +2,12 @@
 #' @name findProtease
 #' @title Find Proteases
 #' @usage findProtease(protein, peptide, organism, start_pos, end_pos)
-#' @description Given a vector of peptides and proteins, finds proteases acting on cleavage sites
-#' @param protein a vector of corresponding UniProt Accession IDs
-#' @param peptide a vector of amino acid sequences
-#' @param organism  name of organism
-#' @param start_pos  (optional) vector of N-terminus position in protein sequence
-#' @param end_pos  (optional) vector of C-terminus position in protein sequence
+#' @description Given a vector of peptides and proteins, finds known proteases acting on cleavage sites.
+#' @param protein a vector of UniProt Accession IDs.
+#' @param peptide a vector of amino acid sequences corresponding to the proteins.
+#' @param organism name of organism.
+#' @param start_pos (optional) vector of N-terminus position in protein sequence.
+#' @param end_pos (optional) vector of C-terminus position in protein sequence.
 #'
 #' @include Classes.R Generics.R Methods.R helper-functions.R
 #'
@@ -26,14 +26,14 @@
 findProtease <- function(protein, peptide, organism = "Homo sapiens", start_pos, end_pos) {
 
     # Define local variables as NULL (due to non-standard evaluation in data.table)
-    uniprot_id <- seq_name <- Uniprot <- Organism <- Status <- .N <- NULL
+    `Protease (Uniprot)` <- `Protease (MEROPS)` <- `Substrate organism` <- `Protease organism` <- `Substrate (Uniprot)` <- `Protease status` <- seq_name <- .N <- NULL
 
     # Internal data: MEROPS Substrate_search.sql and Uniprot ID to MEROPS identifier mapping
     mer <- get0("mer", envir = asNamespace("proteasy"))
     merops_map <- get0("merops_map", envir = asNamespace("proteasy"))
 
     if(!(length(peptide) == length(protein))) stop("Peptide and protein vectors must be the same length.")
-    if(!(organism %in% unique(mer$organism))) stop("Organism not recognized")
+    if(!(organism %in% unique(mer$`Substrate organism`))) stop("Organism not recognized")
 
     if((missing(start_pos) | missing(end_pos))) {
 
@@ -84,60 +84,51 @@ findProtease <- function(protein, peptide, organism = "Homo sapiens", start_pos,
         input <- data.table::data.table(protein, peptide, start_pos, end_pos)
     }
 
-    mer <- mer[organism == organism & Uniprot %in% unique_proteins]
+    mer <- mer[`Substrate organism` == organism & `Substrate (Uniprot)` %in% unique_proteins]
 
     r <- matchTermini(input)
 
-    merops_map <- merops_map[startsWith(Organism, organism)]
+    r <- mapMEROPSIDs(r)
 
-    data.table::setkey(r, "code")
-    data.table::setkey(merops_map, "Cross-reference (MEROPS)")
-
-    r <- merops_map[r, nomatch = NULL]
-
-    r <- r[order(Status, decreasing = F)]
-
-    r <- r[!duplicated(r[, c("peptide", "protein", "Entry", "Cross-reference (MEROPS)", "terminus", "cleavage_type")])]
+    r <- r[!duplicated(r[, c("peptide", "protein", "Protease (Uniprot)", "Protease (MEROPS)", "terminus", "Cleavage type")])]
 
     names(r) <- c("Protease (Uniprot)",     # 1
                   "Protease status",        # 2
-                  "Protease (Gene names)",  # 3
-                  "Organism",               # 4
-                  "Protease (MEROPS)",      # 5
-                  "Substrate (Uniprot)",    # 6
-                  "Substrate sequence",     # 7
-                  "Peptide",                # 8
-                  "Start position",         # 9
-                  "End position",           # 10
-                  "Cleaved residue",        # 11
-                  "Substrate name",         # 12
-                  "organism",               # 13
-                  "Protease name",          # 14
-                  "Cleavage type",          # 15
-                  "Cleaved terminus")       # 16
+                  "Protease organism",      # 3
+                  "Protease (MEROPS)",      # 4
+                  "Substrate (Uniprot)",    # 5
+                  "Substrate sequence",     # 6
+                  "Peptide",                # 7
+                  "Start position",         # 8
+                  "End position",           # 9
+                  "Cleaved residue",        # 10
+                  "Substrate name",         # 11
+                  "Substrate organism",     # 12
+                  "Protease name",          # 13
+                  "Cleavage type",          # 14
+                  "Cleaved terminus")       # 15
 
-    substrate <- data.table::data.table("Substrate name"       = r[, 12][[1]],
-                                        "Substrate (Uniprot)"  = r[, 6][[1]],
-                                        "Substrate sequence"   = r[, 7][[1]],
-                                        "Substrate length"     = nchar(r[, 7][[1]]),
-                                        "Peptide"              = r[, 8][[1]],
-                                        "Start position"       = r[, 9][[1]],
-                                        "End position"         = r[, 10][[1]])
+    substrate <- data.table::data.table("Substrate name"       = r[, 11][[1]],
+                                        "Substrate (Uniprot)"  = r[, 5][[1]],
+                                        "Substrate sequence"   = r[, 6][[1]],
+                                        "Substrate length"     = nchar(r[, 6][[1]]),
+                                        "Peptide"              = r[, 7][[1]],
+                                        "Start position"       = r[, 8][[1]],
+                                        "End position"         = r[, 9][[1]])
 
-    protease <- data.table::data.table("Protease name"         = r[, 14][[1]],
+    protease <- data.table::data.table("Protease name"         = r[, 13][[1]],
                                        "Protease (Uniprot)"    = r[, 1][[1]],
                                        "Protease status"       = r[, 2][[1]],
-                                       "Protease (Gene names)" = r[, 3][[1]],
-                                       "Protease (MEROPS)"     = r[, 5][[1]],
-                                       "Protease URL"          = paste0("https://www.ebi.ac.uk/merops/cgi-bin/pepsum?id=", r[, 5][[1]]))
+                                       "Protease (MEROPS)"     = r[, 4][[1]],
+                                       "Protease URL"          = paste0("https://www.ebi.ac.uk/merops/cgi-bin/pepsum?id=", r[, 4][[1]]))
 
-    cleavage <- data.table::data.table("Substrate (Uniprot)"   = r[, 6][[1]],
-                                        "Peptide"              = r[, 8][[1]],
+    cleavage <- data.table::data.table("Substrate (Uniprot)"   = r[, 5][[1]],
+                                        "Peptide"              = r[, 7][[1]],
                                         "Protease (Uniprot)"   = r[, 1][[1]],
                                         "Protease status"      = r[, 2][[1]],
-                                        "Cleaved residue"      = r[, 11][[1]],
-                                        "Cleaved terminus"     = r[, 16][[1]],
-                                        "Cleavage type"        = r[, 15][[1]])
+                                        "Cleaved residue"      = r[, 10][[1]],
+                                        "Cleaved terminus"     = r[, 15][[1]],
+                                        "Cleavage type"        = r[, 14][[1]])
 
 
     return(
