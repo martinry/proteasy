@@ -1,25 +1,24 @@
 
-#' @name showProtease
+#' @name searchProtease
 #' @title Show Cleaving Data for a Peptidase or Inhibitor by Uniprot accession
-#' @usage showProtease(protein)
+#' @usage searchProtease(protein)
 #' @description Given a vector of proteins, finds which substrates they cleave.
 #' @param protein a vector of corresponding UniProt Accession IDs.
 #' @param summarize if false (default), provides a detailed table of all associated cleaving events, otherwise outputs a summarized table and only includes reviewed (Uniprot) entries.
 #'
 #' @include Classes.R Generics.R Methods.R helper-functions.R
 #'
-#'
-#' @return S4 object Cleavages
+#' @return data.table, character
 #'
 #' @examples
 #' protein <- c("P98073", "P00734")
-#' showProtease(protein = protein)
+#' searchProtease(protein = protein)
 #'
 #' @export
 #'
 #' @importFrom data.table data.table
 
-showProtease <- function(protein, summarize = FALSE) {
+searchProtease <- function(protein, summarize = FALSE) {
 
     # Define local variables as NULL (due to non-standard evaluation in data.table)
     `Protease (Uniprot)` <- `Protease (MEROPS)` <- `Substrate organism` <- `Substrate (Uniprot)` <- `Protease status` <- .N <- NULL

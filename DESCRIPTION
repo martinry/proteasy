@@ -36,5 +36,5 @@ Collate:
     'browseProtease.R'
     'helper-functions.R'
     'findProtease.R'
-    'showProtease.R'
-    'showSubstrate.R'
+    'searchProtease.R'
+    'searchSubstrate.R'

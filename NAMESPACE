@@ -2,7 +2,7 @@
 
 export(browseProtease)
 export(findProtease)
-export(showProtease)
-export(showSubstrate)
+export(searchProtease)
+export(searchSubstrate)
 importFrom(data.table,data.table)
 importFrom(data.table,setkeyv)

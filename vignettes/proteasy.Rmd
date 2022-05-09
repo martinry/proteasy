@@ -8,7 +8,9 @@ output:
 vignette: >
   %\VignetteIndexEntry{Using proteasy to retrieve proteases acting on cleavage sites}
   %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteKeywords{Proteomics, Bioinformatics, Cleavage, Polypeptides, MEROPS, Proteases}
   %\VignetteEncoding{UTF-8}
+  %\VignettePackage{proteasy}
 ---
 
 ```{r biocstyle, echo = FALSE, results = "asis", message = FALSE}
@@ -18,7 +20,7 @@ BiocStyle::markdown()
 
 # Introduction
 
-This package utilizes data derived from the MEROPS database (https://www.ebi.ac.uk/merops/). Similarly to existing tools such as TopFind (https://topfind.clip.msl.ubc.ca/), proteasy exists for the purpose of retrieving data on proteolytic enzymes by mapping peptide termini to known sites where a protease cleaves.
+This package utilizes data derived from the MEROPS database (https://www.ebi.ac.uk/merops/). Similarly to existing tools such as TopFind (https://topfind.clip.msl.ubc.ca/), `r BiocStyle::Biocpkg("proteasy")` exists for the purpose of retrieving data on proteolytic enzymes by mapping peptide termini to known sites where a protease cleaves. Unlike the `r BiocStyle::Biocpkg("cleaver")` package, which allows for in-silico cleavage of amino acid sequences by specifying an enzyme, the functions in `r BiocStyle::Biocpkg("proteasy")` relies only on experimentally derived data to find proteases annotated to cleavage sites.
 
 This document illustrates the functionality of proteasy through some use cases.
 
@@ -47,10 +49,10 @@ library("proteasy")
 
 ## Find known cleavages for a protein
 
-```{r Show substrate, eval = TRUE}
+```{r Search substrate, eval = TRUE}
 
 # Kininogen-1
-showSubstrate(protein = "P01042", summarize = TRUE)
+searchSubstrate(protein = "P01042", summarize = TRUE)
 
 ```
 
@@ -60,7 +62,7 @@ showSubstrate(protein = "P01042", summarize = TRUE)
 ```{r Show protease, eval = TRUE}
 
 # MMP12
-showProtease(protein = "P39900", summarize = TRUE)
+searchProtease(protein = "P39900", summarize = TRUE)
 
 ```
 
@@ -94,3 +96,8 @@ proteasy:::cleavages(res)
 ```
 
 
+# Session Information
+
+```{r sessioninfo, echo=FALSE}
+sessionInfo()
+```
