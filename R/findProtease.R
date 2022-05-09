@@ -11,7 +11,6 @@
 #'
 #' @include Classes.R Generics.R Methods.R helper-functions.R
 #'
-#'
 #' @return S4 object Cleavages
 #'
 #' @examples
@@ -20,8 +19,6 @@
 #' res <- findProtease(protein = protein, peptide = peptide, organism = "Homo sapiens")
 #'
 #' @export
-#'
-#' @importFrom data.table data.table setkeyv
 
 findProtease <- function(protein, peptide, organism = "Homo sapiens", start_pos, end_pos) {
 

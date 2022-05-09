@@ -15,8 +15,6 @@
 #' searchSubstrate(protein = protein)
 #'
 #' @export
-#'
-#' @importFrom data.table data.table
 
 searchSubstrate <- function(protein, summarize = FALSE) {
 

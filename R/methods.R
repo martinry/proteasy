@@ -4,41 +4,38 @@
 ##
 ##***********************************************************************
 
+#' @name proteases
 #' @title Access resulting object from `findProteases` function.
-#' @description `proteases`, `substrates` and `cleavages` returns a `data.table` with the
+#' @description `proteases` returns a `data.table` with the
 #' corresponding details derived from MEROPS.
-#'
-#' @param object A `data.table` object.
+#' @aliases proteases-Cleavages proteases,Cleavages-method
+#' @param x A `data.table` object.
 #'
 #' @return A `data.table` object.
-#'
-#' @export
-#' @md
-
+#' @rdname proteases
+#' @exportMethod proteases
 setMethod( f = "proteases", signature = "Cleavages", definition = function( x ) return( x@protease ))
 
+#' @name substrates
 #' @title Access resulting object from `findProteases` function.
-#' @description `proteases`, `substrates` and `cleavages` returns a `data.table` with the
+#' @description `substrates` returns a `data.table` with the
 #' corresponding details derived from MEROPS.
-#'
-#' @param object A `data.table` object.
+#' @aliases substrates-Cleavages substrates,Cleavages-method
+#' @param x A `data.table` object.
 #'
 #' @return A `data.table` object.
-#'
-#' @export
-#' @md
-
+#' @rdname substrates
+#' @exportMethod substrates
 setMethod( f = "substrates", signature = "Cleavages", definition = function( x ) return( x@substrate ))
 
+#' @name cleavages
 #' @title Access resulting object from `findProteases` function.
-#' @description `proteases`, `substrates` and `cleavages` returns a `data.table` with the
+#' @description `cleavages` returns a `data.table` with the
 #' corresponding details derived from MEROPS.
-#'
-#' @param object A `data.table` object.
+#' @aliases cleavages-Cleavages cleavages,Cleavages-method
+#' @param x A `data.table` object.
 #'
 #' @return A `data.table` object.
-#'
-#' @export
-#' @md
-
+#' @rdname cleavages
+#' @exportMethod cleavages
 setMethod( f = "cleavages", signature = "Cleavages", definition = function( x ) return( x@cleavage ))

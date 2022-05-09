@@ -15,8 +15,6 @@
 #' searchProtease(protein = protein)
 #'
 #' @export
-#'
-#' @importFrom data.table data.table
 
 searchProtease <- function(protein, summarize = FALSE) {
 

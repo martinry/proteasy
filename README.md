@@ -27,9 +27,9 @@ peptide <- c("FEEVSGNVSPGTR", "FVSETESR", "LLVVYPW", "ITLLSAL")
 
 res <- findProtease(protein = protein, peptide = peptide, organism = "Homo sapiens")
 
-proteasy:::substrates(res)
-proteasy:::proteases(res)
-proteasy:::cleavages(res)
+substrates(res)
+proteases(res)
+cleavages(res)
 
 # Example 4
 

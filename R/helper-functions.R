@@ -30,7 +30,7 @@ getSeqData <- function(method, protein, organism) {
         p <- switch(organism,
                     "Homo sapiens" = EnsDb.Hsapiens.v86::EnsDb.Hsapiens.v86,
                     "Mus musculus" = EnsDb.Mmusculus.v79::EnsDb.Mmusculus.v79,
-                    "Rattus norvegicus" = EnsDb.Mmusculus.v79::EnsDb.Mmusculus.v79)
+                    "Rattus norvegicus" = EnsDb.Rnorvegicus.v79::EnsDb.Rnorvegicus.v79)
 
         p <- data.table::as.data.table(
             ensembldb::proteins(p,
