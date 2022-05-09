@@ -1,9 +1,12 @@
 Package: proteasy
 Type: Package
 Title: Protease Mapping
-Version: 0.1.0
-Author: Martin Rydén
-Maintainer: Martin Rydén <martin.ryden@med.lu.se>
+Version: 0.99.0
+Authors@R: c(person("Martin", "Rydén", role=c("aut", "cre"),
+                    email="martin.ryden@med.lu.se",
+                    comment=c(ORCID="0000-0001-6968-4314")))
+Description: Retrieval and mapping of experimentally derived protease and cleavage data from the MEROPS database.
+biocViews: Proteomics
 URL: https://github.com/martinry/proteasy
 BugReports: https://github.com/martinry/proteasy/issues
 Depends:
@@ -24,7 +27,6 @@ Suggests:
     BiocStyle,
     knitr,
     rmarkdown
-Description: Finds proteases acting on cleavage sites based on the MEROPS database.
 License: GPL-3 + file LICENSE
 VignetteBuilder: knitr
 Encoding: UTF-8

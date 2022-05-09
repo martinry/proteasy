@@ -18,6 +18,8 @@
 #' peptide <- c("FEEVSGNVSPGTR", "FVSETESR", "LLVVYPW", "ITLLSAL")
 #' res <- findProtease(protein = protein, peptide = peptide, organism = "Homo sapiens")
 #'
+#' @importFrom data.table data.table
+#'
 #' @export
 
 findProtease <- function(protein, peptide, organism = "Homo sapiens", start_pos, end_pos) {
