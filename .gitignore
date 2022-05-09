@@ -69,3 +69,7 @@ unsrturl.bst
 .seed,
 .settings
 .tm_properties
+.Rbuildignore
+.Rhistory
+.Rproj.user
+proteasy.Rproj
