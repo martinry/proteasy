@@ -32,7 +32,7 @@ showProtease <- function(protein, summarize = FALSE) {
 
     r <- mapMEROPSIDs(r)
 
-    if(summarize) r <- r[`Protease status` == "reviewed"]$`Protease (Uniprot)`
+    if(summarize) r <- r[`Protease status` == "reviewed"]$`Substrate (Uniprot)`
 
     return(unique(r))
 

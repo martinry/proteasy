@@ -60,7 +60,7 @@ showSubstrate(protein = "P01042", summarize = TRUE)
 ```{r Show protease, eval = TRUE}
 
 # MMP12
-showProtease(protein = "P39900", summarize = FALSE)
+showProtease(protein = "P39900", summarize = TRUE)
 
 ```
 

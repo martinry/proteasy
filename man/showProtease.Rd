@@ -9,7 +9,7 @@ showProtease(protein)
 \arguments{
 \item{protein}{a vector of corresponding UniProt Accession IDs.}
 
-\item{summarize}{if false (default), provides a detailed table of all associated cleaving events, otherwise outputs a summarized table.}
+\item{summarize}{if false (default), provides a detailed table of all associated cleaving events, otherwise outputs a summarized table and only includes reviewed (Uniprot) entries.}
 }
 \value{
 S4 object Cleavages
