@@ -1,7 +1,7 @@
 
 #' @name searchProtease
 #' @title Show Cleaving Data for a Peptidase or Inhibitor by Uniprot accession
-#' @usage searchProtease(protein)
+#' @usage searchProtease(protein, summarize = FALSE)
 #' @description Given a vector of proteins, finds which substrates they cleave.
 #' @param protein a vector of corresponding UniProt Accession IDs.
 #' @param summarize if false (default), provides a detailed table of all associated cleaving events, otherwise outputs a summarized table and only includes reviewed (Uniprot) entries.

@@ -4,7 +4,7 @@
 \alias{searchProtease}
 \title{Show Cleaving Data for a Peptidase or Inhibitor by Uniprot accession}
 \usage{
-searchProtease(protein)
+searchProtease(protein, summarize = FALSE)
 }
 \arguments{
 \item{protein}{a vector of corresponding UniProt Accession IDs.}

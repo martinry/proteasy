@@ -82,15 +82,15 @@ res <- findProtease(protein = protein, peptide = peptide, organism = "Homo sapie
 
 # 1. Display sequence data for the provided input:
 
-proteasy:::substrates(res)
+substrates(res)
 
 # 2. Show which known proteases may have cleaved this protein:
 
-proteasy:::proteases(res)
+proteases(res)
 
 # 3. Display details of associated proteolytic events:
 
-proteasy:::cleavages(res)
+cleavages(res)
 
 
 ```

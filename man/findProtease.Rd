@@ -13,9 +13,9 @@ findProtease(protein, peptide, organism, start_pos, end_pos)
 
 \item{organism}{name of organism.}
 
-\item{start_pos}{(optional) vector of N-terminus position in protein sequence.}
+\item{start_pos}{(optional) numeric vector of N-terminus positions in protein sequence.}
 
-\item{end_pos}{(optional) vector of C-terminus position in protein sequence.}
+\item{end_pos}{(optional) numeric vector of C-terminus positions in protein sequence.}
 }
 \value{
 S4 object Cleavages

@@ -6,8 +6,8 @@
 #' @param protein a vector of UniProt Accession IDs.
 #' @param peptide a vector of amino acid sequences corresponding to the proteins.
 #' @param organism name of organism.
-#' @param start_pos (optional) vector of N-terminus position in protein sequence.
-#' @param end_pos (optional) vector of C-terminus position in protein sequence.
+#' @param start_pos (optional) numeric vector of N-terminus positions in protein sequence.
+#' @param end_pos (optional) numeric vector of C-terminus positions in protein sequence.
 #'
 #' @include Classes.R Generics.R Methods.R helper-functions.R
 #'
