@@ -97,7 +97,7 @@ mapMEROPSIDs <- function(r) {
 
     r <- merops_map[r, nomatch = NULL]
 
-    r <- r[order(`Protease status`, decreasing = F)]
+    r <- r[order(`Protease status`, decreasing = FALSE)]
 
 
     return(r)

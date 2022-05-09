@@ -1,17 +1,14 @@
-
 #' @name browseProtease
 #' @title Browse Protease on MEROPS
 #' @usage browseProtease(p, keytype)
 #' @description Opens relevant MEROPS (https://www.ebi.ac.uk/merops/) page with information on specified protease.
 #' @param p a single protease
 #' @param keytype UniprotID (default) or MEROPS.
-#'
 #' @examples
 #' browseProtease("P07339", keytype = "UniprotID")
 #' browseProtease("A01.009", keytype = "MEROPS")
 #'
 #' @export
-
 
 browseProtease <- function(p, keytype = "UniprotID") {
 

@@ -4,7 +4,8 @@
 #' @usage searchSubstrate(protein, summarize = FALSE)
 #' @description Given a vector of proteins, finds known proteases acting on cleavage sites.
 #' @param protein a vector of corresponding UniProt Accession IDs.
-#' @param summarize if false (default), provides a detailed table of all associated cleaving events, otherwise outputs a summarized table and only includes reviewed (Uniprot) entries.
+#' @param summarize if false (default), provides a detailed table of all associated cleaving events,
+#' otherwise outputs a summarized table and only includes reviewed (Uniprot) entries.
 #'
 #' @include Classes.R Generics.R Methods.R helper-functions.R
 #'
@@ -21,7 +22,8 @@
 searchSubstrate <- function(protein, summarize = FALSE) {
 
     # Define local variables as NULL (due to non-standard evaluation in data.table)
-    `Protease (Uniprot)` <- `Protease (MEROPS)` <- `Substrate organism` <- `Substrate (Uniprot)` <- `Protease status` <- .N <- NULL
+    `Protease (Uniprot)` <- `Protease (MEROPS)` <- `Substrate organism` <- NULL
+    `Substrate (Uniprot)` <- `Protease status` <- .N <- NULL
 
     # Show all data for substrate
 
@@ -29,7 +31,7 @@ searchSubstrate <- function(protein, summarize = FALSE) {
 
     r <- mapMEROPSIDs(r)
 
-    if(summarize) r <- r[`Protease status` == "reviewed", c(1, 7)]$`Protease (Uniprot)`
+    if(summarize == TRUE) r <- r[`Protease status` == "reviewed", c(1, 7)]$`Protease (Uniprot)`
 
     return(unique(r))
 

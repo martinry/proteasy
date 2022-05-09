@@ -25,7 +25,8 @@
 findProtease <- function(protein, peptide, organism = "Homo sapiens", start_pos, end_pos) {
 
     # Define local variables as NULL (due to non-standard evaluation in data.table)
-    `Protease (Uniprot)` <- `Protease (MEROPS)` <- `Substrate organism` <- `Protease organism` <- `Substrate (Uniprot)` <- `Protease status` <- seq_name <- .N <- NULL
+    `Protease (Uniprot)` <- `Protease (MEROPS)` <- `Substrate organism` <- NULL
+    `Protease organism` <- `Substrate (Uniprot)` <- `Protease status` <- seq_name <- .N <- NULL
 
     # Internal data: MEROPS Substrate_search.sql and Uniprot ID to MEROPS identifier mapping
     mer <- get0("mer", envir = asNamespace("proteasy"))
@@ -89,7 +90,8 @@ findProtease <- function(protein, peptide, organism = "Homo sapiens", start_pos,
 
     r <- mapMEROPSIDs(r)
 
-    r <- r[!duplicated(r[, c("peptide", "protein", "Protease (Uniprot)", "Protease (MEROPS)", "terminus", "Cleavage type")])]
+    r <- r[!duplicated(r[, c("peptide", "protein", "Protease (Uniprot)",
+                             "Protease (MEROPS)", "terminus", "Cleavage type")])]
 
     names(r) <- c("Protease (Uniprot)",     # 1
                   "Protease status",        # 2
