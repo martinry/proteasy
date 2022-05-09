@@ -11,6 +11,9 @@ browseProtease(p, keytype)
 
 \item{keytype}{UniprotID (default) or MEROPS.}
 }
+\value{
+utils::browseURL
+}
 \description{
 Opens relevant MEROPS (https://www.ebi.ac.uk/merops/) page with information on specified protease.
 }

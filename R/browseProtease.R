@@ -8,6 +8,8 @@
 #' browseProtease("P07339", keytype = "UniprotID")
 #' browseProtease("A01.009", keytype = "MEROPS")
 #'
+#' @return utils::browseURL
+#'
 #' @export
 
 browseProtease <- function(p, keytype = "UniprotID") {
