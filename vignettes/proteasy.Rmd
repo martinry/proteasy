@@ -95,6 +95,14 @@ proteasy:::cleavages(res)
 
 ```
 
+## Look up a protease on MEROPS
+
+```{r Browse protease, eval = TRUE}
+
+browseProtease("P07339", keytype = "UniprotID") # (opens web browser)
+
+```
+
 
 # Session Information
 
