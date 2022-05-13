@@ -25,6 +25,10 @@ searchProtease <- function(protein, summarize = FALSE) {
     `Protease (Uniprot)` <- `Protease (MEROPS)` <- `Substrate organism` <- NULL
     `Substrate (Uniprot)` <- `Protease status` <- .N <- NULL
 
+    # Internal data: MEROPS Substrate_search.sql and Uniprot ID to MEROPS identifier mapping
+    mer <- get0("mer", envir = asNamespace("proteasy"))
+    merops_map <- get0("merops_map", envir = asNamespace("proteasy"))
+
     # Show all data for protease
 
     protein_merops <- merops_map[`Protease (Uniprot)` %in% protein, c(3,4)]
