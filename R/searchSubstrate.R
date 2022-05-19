@@ -33,7 +33,7 @@ searchSubstrate <- function(protein, summarize = FALSE) {
 
     r <- mer[`Substrate (Uniprot)` %in% protein]
 
-    r <- mapMEROPSIDs(r)
+    r <- mapMEROPSIDs(r, merops_map)
 
     if(summarize == TRUE) r <- r[`Protease status` == "reviewed", c(1, 7)]$`Protease (Uniprot)`
 

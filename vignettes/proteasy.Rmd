@@ -18,6 +18,17 @@ library(BiocStyle)
 BiocStyle::markdown()
 ```
 
+```{r loadInternal, echo = FALSE}
+
+library("proteasy")
+
+# Internal data: MEROPS Substrate_search.sql and Uniprot ID to MEROPS identifier mapping
+mer <- get0("mer", envir = asNamespace("proteasy"))
+
+merops_map <- get0("merops_map", envir = asNamespace("proteasy"))
+
+```
+
 # Introduction
 
 This package utilizes data derived from the MEROPS database (https://www.ebi.ac.uk/merops/). Similarly to existing tools such as TopFind (https://topfind.clip.msl.ubc.ca/), `r BiocStyle::Biocpkg("proteasy")` exists for the purpose of retrieving data on proteolytic enzymes by mapping peptide termini to known sites where a protease cleaves. Unlike the `r BiocStyle::Biocpkg("cleaver")` package, which allows for in-silico cleavage of amino acid sequences by specifying an enzyme, the functions in `r BiocStyle::Biocpkg("proteasy")` relies only on experimentally derived data to find proteases annotated to cleavage sites.
@@ -30,10 +41,10 @@ The package should be installed using as described below:
 
 ```{r installPackage, eval = FALSE}
 
-if (!requireNamespace("BiocManager", quietly = TRUE))
-    install.packages("BiocManager")
-
-BiocManager::install("proteasy")
+# if (!requireNamespace("BiocManager", quietly = TRUE))
+#     install.packages("BiocManager")
+# 
+# BiocManager::install("proteasy")
 
 ```
 

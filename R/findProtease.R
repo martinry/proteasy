@@ -86,9 +86,9 @@ findProtease <- function(protein, peptide, organism = "Homo sapiens", start_pos,
 
     mer <- mer[`Substrate organism` == organism & `Substrate (Uniprot)` %in% unique_proteins]
 
-    r <- matchTermini(input)
+    r <- matchTermini(input, mer)
 
-    r <- mapMEROPSIDs(r)
+    r <- mapMEROPSIDs(r, merops_map)
 
     r <- r[!duplicated(r[, c("peptide", "protein", "Protease (Uniprot)",
                              "Protease (MEROPS)", "terminus", "Cleavage type")])]

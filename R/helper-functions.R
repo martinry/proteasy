@@ -55,7 +55,7 @@ getSeqData <- function(method, protein, organism) {
 ### Match N/C termini between user input and MEROPS db
 ##
 
-matchTermini <- function(input) {
+matchTermini <- function(input, mer) {
 
     .N <- NULL
 
@@ -86,7 +86,7 @@ matchTermini <- function(input) {
 ### Map MEROPS ID to Uniprot
 ##
 
-mapMEROPSIDs <- function(r) {
+mapMEROPSIDs <- function(r, merops_map) {
 
     seq_name <- .N <- `Protease organism` <- `Protease status` <- NULL
 
