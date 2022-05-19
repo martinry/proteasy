@@ -6,8 +6,14 @@
 #' @param keytype UniprotID (default) or MEROPS.
 #' @examples
 #' \dontrun{
+#' if (interactive()) {
+#'
+#' # The following function calls opens in browser
+#'
 #' browseProtease("P07339", keytype = "UniprotID")
 #' browseProtease("A01.009", keytype = "MEROPS")
+#'
+#' }
 #' }
 #'
 #' @return utils::browseURL

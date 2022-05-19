@@ -19,8 +19,14 @@ Opens relevant MEROPS (https://www.ebi.ac.uk/merops/) page with information on s
 }
 \examples{
 \dontrun{
+if (interactive()) {
+
+# The following function calls opens in browser
+
 browseProtease("P07339", keytype = "UniprotID")
 browseProtease("A01.009", keytype = "MEROPS")
+
+}
 }
 
 }
