@@ -59,6 +59,9 @@ matchTermini <- function(input, mer) {
 
     .N <- NULL
 
+    input <- data.table::as.data.table(input)
+    mer <- data.table::as.data.table(mer)
+
     # Find N-terminus matches
     data.table::setkeyv(input, c("protein", "start_pos"))
     data.table::setkeyv(mer, c("Substrate (Uniprot)", "Residue number"))
@@ -89,6 +92,9 @@ matchTermini <- function(input, mer) {
 mapMEROPSIDs <- function(r, merops_map) {
 
     seq_name <- .N <- `Protease organism` <- `Protease status` <- NULL
+
+    merops_map <- data.table::as.data.table(merops_map)
+    r <- data.table::as.data.table(r)
 
     merops_map <- merops_map[`Protease organism` %in% r$`Substrate organism`]
 

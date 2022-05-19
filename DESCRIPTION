@@ -1,7 +1,7 @@
 Package: proteasy
 Type: Package
 Title: Protease Mapping
-Version: 0.99.0
+Version: 0.99.1
 Authors@R: c(person("Martin", "Rydén", role=c("aut", "cre"),
                     email="martin.ryden@med.lu.se",
                     comment=c(ORCID="0000-0001-6968-4314")))
@@ -29,6 +29,7 @@ Suggests:
     knitr,
     rmarkdown
 License: GPL-3 + file LICENSE
+LazyData: true
 VignetteBuilder: knitr
 Encoding: UTF-8
 RoxygenNote: 7.2.0
