@@ -18,7 +18,9 @@ utils::browseURL
 Opens relevant MEROPS (https://www.ebi.ac.uk/merops/) page with information on specified protease.
 }
 \examples{
+\dontrun{
 browseProtease("P07339", keytype = "UniprotID")
 browseProtease("A01.009", keytype = "MEROPS")
+}
 
 }

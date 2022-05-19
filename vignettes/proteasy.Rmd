@@ -110,7 +110,7 @@ cleavages(res)
 
 ```{r Browse protease, eval = FALSE}
 
-browseProtease("P07339", keytype = "UniprotID") # (opens web browser)
+# browseProtease("P07339", keytype = "UniprotID") # (opens web browser)
 
 ```
 

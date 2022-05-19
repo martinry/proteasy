@@ -5,8 +5,10 @@
 #' @param p a single protease
 #' @param keytype UniprotID (default) or MEROPS.
 #' @examples
+#' \dontrun{
 #' browseProtease("P07339", keytype = "UniprotID")
 #' browseProtease("A01.009", keytype = "MEROPS")
+#' }
 #'
 #' @return utils::browseURL
 #'
