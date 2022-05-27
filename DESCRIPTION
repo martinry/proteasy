@@ -1,7 +1,7 @@
 Package: proteasy
 Type: Package
 Title: Protease Mapping
-Version: 0.99.3
+Version: 0.99.4
 Authors@R: c(person("Martin", "Rydén", role=c("aut", "cre"),
                     email="martin.ryden@med.lu.se",
                     comment=c(ORCID="0000-0001-6968-4314")))
