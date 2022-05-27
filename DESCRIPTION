@@ -5,6 +5,7 @@ Version: 0.99.3
 Authors@R: c(person("Martin", "Rydén", role=c("aut", "cre"),
                     email="martin.ryden@med.lu.se",
                     comment=c(ORCID="0000-0001-6968-4314")))
+Maintainer: Martin Rydén <martin.ryden@med.lu.se>
 Description: Retrieval of experimentally derived protease and cleavage data from the MEROPS database.
         This package contains functions for mapping peptide termini to known sites where a protease cleaves.
 biocViews: Proteomics
