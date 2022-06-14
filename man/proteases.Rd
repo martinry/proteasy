@@ -21,6 +21,7 @@ corresponding details derived from MEROPS.
 \examples{
 protein <- c("P02671", "P02671", "P68871", "P01011")
 peptide <- c("FEEVSGNVSPGTR", "FVSETESR", "LLVVYPW", "ITLLSAL")
-res <- findProtease(protein = protein, peptide = peptide, organism = "Homo sapiens")
+res <- findProtease(protein = protein, peptide = peptide,
+organism = "Homo sapiens")
 proteases(res)
 }

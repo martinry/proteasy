@@ -15,10 +15,11 @@ browseProtease(p, keytype)
 utils::browseURL
 }
 \description{
-Opens relevant MEROPS (https://www.ebi.ac.uk/merops/) page with information on specified protease.
+Opens relevant MEROPS (https://www.ebi.ac.uk/merops/)
+page with information on specified protease.
 }
 \examples{
-\dontrun{
+\donttest{
 if (interactive()) {
 
 # The following function calls opens in browser

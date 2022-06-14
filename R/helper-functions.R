@@ -18,8 +18,9 @@ getSeqData <- function(method, protein, organism) {
 
         p <- data.table::as.data.table(t(
             vapply(p, FUN.VALUE = data.table::data.table("x", "y"),
-                   FUN = function(x) data.table::data.table(seq_name = as.character(
-                       sub("\\|.*", "",
+                   FUN = function(x) data.table::data.table(seq_name =
+                as.character(
+                    sub("\\|.*", "",
                            sub(".*\\|(.*)\\|.*", "\\1",
                                names(x)))), sequence = as.character(x[[1]]))
             )))
@@ -28,21 +29,21 @@ getSeqData <- function(method, protein, organism) {
 
         # ensembldb method
         p <- switch(organism,
-                    "Homo sapiens" = EnsDb.Hsapiens.v86::EnsDb.Hsapiens.v86,
-                    "Mus musculus" = EnsDb.Mmusculus.v79::EnsDb.Mmusculus.v79,
-                    "Rattus norvegicus" = EnsDb.Rnorvegicus.v79::EnsDb.Rnorvegicus.v79)
+            "Homo sapiens" = EnsDb.Hsapiens.v86::EnsDb.Hsapiens.v86,
+            "Mus musculus" = EnsDb.Mmusculus.v79::EnsDb.Mmusculus.v79,
+            "Rattus norvegicus" = EnsDb.Rnorvegicus.v79::EnsDb.Rnorvegicus.v79)
 
         p <- data.table::as.data.table(
             ensembldb::proteins(p,
-                                filter = AnnotationFilter::UniprotFilter(protein),
-                                columns = c("uniprot_id", "protein_sequence"),
-                                return.type = "data.frame"))
+                    filter = AnnotationFilter::UniprotFilter(protein),
+                    columns = c("uniprot_id", "protein_sequence"),
+                    return.type = "data.frame"))
 
         p <- data.table::setnames(x = p,
                                   old = c("uniprot_id", "protein_sequence"),
                                   new = c("seq_name", "sequence"))
 
-        p <- p[!BiocGenerics::duplicated(p$seq_name), 1:2]
+        p <- p[!duplicated(p$seq_name), c("seq_name", "sequence")]
 
     }
 
@@ -98,10 +99,10 @@ mapMEROPSIDs <- function(r, merops_map) {
 
     merops_map <- merops_map[`Protease organism` %in% r$`Substrate organism`]
 
-    data.table::setkey(r, "Protease (MEROPS)")
-    data.table::setkey(merops_map, "Protease (MEROPS)")
+    data.table::setkeyv(r, "Protease (MEROPS)")
+    data.table::setkeyv(merops_map, "Protease (MEROPS)")
 
-    r <- merops_map[r, nomatch = NULL]
+    r <- merops_map[r, nomatch = NULL, allow.cartesian = TRUE]
 
     r <- r[order(`Protease status`, decreasing = FALSE)]
 

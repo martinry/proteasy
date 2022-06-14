@@ -1,2 +1,7 @@
+
+Version 0.99.6 [2022-06-15]:
+- Changed from sysdata.rda to inst/extdata.
+- Added more text and examples to vignette
+
 Version 0.99.0 [2022-05-09]:
 - Initial release.

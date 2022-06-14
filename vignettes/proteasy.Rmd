@@ -1,14 +1,16 @@
 ---
-title: "Using proteasy to Retrieve Protease Data"
+title: "Using proteasy to Retrieve and Analyze Protease Data"
 author: "Martin Rydén"
 package: proteasy
 output:
   BiocStyle::html_document:
     toc_float: true
 vignette: >
-  %\VignetteIndexEntry{Using proteasy to retrieve proteases acting on cleavage sites}
+  %\VignetteIndexEntry{Using proteasy to retrieve proteases acting
+  on cleavage sites}
   %\VignetteEngine{knitr::rmarkdown}
-  %\VignetteKeywords{Proteomics, Bioinformatics, Cleavage, Polypeptides, MEROPS, Proteases}
+  %\VignetteKeywords{Proteomics, Bioinformatics,
+  Cleavage, Polypeptides, MEROPS, Proteases}
   %\VignetteEncoding{UTF-8}
   %\VignettePackage{proteasy}
 ---
@@ -16,22 +18,27 @@ vignette: >
 ```{r biocstyle, echo = FALSE, results = "asis", message = FALSE}
 library(BiocStyle)
 BiocStyle::markdown()
-```
-
-```{r loadInternal, echo = FALSE}
-
-library("proteasy")
-
-# Internal data: MEROPS Substrate_search.sql and Uniprot ID to MEROPS identifier mapping
-mer <- get0("mer", envir = asNamespace("proteasy"))
-
-merops_map <- get0("merops_map", envir = asNamespace("proteasy"))
 
 ```
+
+
 
 # Introduction
 
-This package utilizes data derived from the MEROPS database (https://www.ebi.ac.uk/merops/). Similarly to existing tools such as TopFind (https://topfind.clip.msl.ubc.ca/), `r BiocStyle::Biocpkg("proteasy")` exists for the purpose of retrieving data on proteolytic enzymes by mapping peptide termini to known sites where a protease cleaves. Unlike the `r BiocStyle::Biocpkg("cleaver")` package, which allows for in-silico cleavage of amino acid sequences by specifying an enzyme, the functions in `r BiocStyle::Biocpkg("proteasy")` relies only on experimentally derived data to find proteases annotated to cleavage sites.
+This package utilizes data derived from the
+[MEROPS database](https://www.ebi.ac.uk/merops/).
+The database is a manually curated knowledgebase with information about
+proteolytic enzymes (proteases), their inhibitors and substrates. 
+
+Similarly to existing tools such as
+[TopFind](https://topfind.clip.msl.ubc.ca/), and
+[Proteasix](http://www.proteasix.org), `r BiocStyle::Biocpkg("proteasy")`
+exists for the purpose of retrieving data on proteolytic enzymes by mapping
+peptide termini to known sites where a protease cleaves. Unlike the
+`r BiocStyle::Biocpkg("cleaver")` package, which allows for in-silico cleavage
+of amino acid sequences by specifying an enzyme, the functions in
+`r BiocStyle::Biocpkg("proteasy")` relies only on experimentally derived data
+to find proteases annotated to cleavage sites.
 
 This document illustrates the functionality of proteasy through some use cases.
 
@@ -41,16 +48,16 @@ The package should be installed using as described below:
 
 ```{r installPackage, eval = FALSE}
 
-# if (!requireNamespace("BiocManager", quietly = TRUE))
-#     install.packages("BiocManager")
-# 
-# BiocManager::install("proteasy")
+if (!requireNamespace("BiocManager", quietly = TRUE))
+    install.packages("BiocManager")
+
+BiocManager::install("proteasy")
 
 ```
 
 The package can then be loaded with:
 
-```{r loadPackage}
+```{r loadPackage, eval = TRUE}
 
 library("proteasy")
 
@@ -58,65 +65,200 @@ library("proteasy")
 
 # Usage
 
-## Find known cleavages for a protein
+## Find known proteases by substrate search
 
-```{r Search substrate, eval = TRUE}
+A fast way to find which proteases, if any, are annotated as cleaving actors
+for a substrate is by using the function *searchSubstrate*. Setting the 
+parameter summarize = TRUE will return only a vector of reviewed proteases,
+and summarize = FALSE will return a table with details about each cleaving
+event. We will explore the two options for kininogen-1 (P01042).
 
-# Kininogen-1
+```{r SearchSubstrate, eval = TRUE}
+
+# Returns vector of reviewed proteases that cleave P01042
 searchSubstrate(protein = "P01042", summarize = TRUE)
 
+# Returns data.table with details on cleaving events
+searchSubstrate(protein = "P01042", summarize = FALSE) |>
+    head()
+
+# The function also accepts multiple proteins as input. Let's inspect
+# the last rows in the returned data.table.
+searchSubstrate(protein = c("P01042", "P02461"), summarize = FALSE) |>
+    tail()
+
+# With summarize = FALSE we get both reviewed and unreviewed proteases.
+
 ```
 
 
-## Find known substrates a protease cleaves
+## Find substrates by protease search
 
-```{r Show protease, eval = TRUE}
+A corresponding function, *searchProtease*, exists to find which (if any)
+substrates a protease cleaves. The function is demonstrated with
+MMP-12 (P39900) as an example.
 
-# MMP12
+```{r SearchProtease, eval = TRUE}
+
+# Returns vector of substrates that MMP-12 cleave
 searchProtease(protein = "P39900", summarize = TRUE)
 
+# Returns data.table with details on cleaving events that involve MMP-12
+searchProtease(protein = "P39900", summarize = FALSE) |> head()
+
 ```
 
-## Find possible proteases for cleaved substrates
+## Find possible proteases for cleaved peptides
 
-```{r Find protease, eval = TRUE}
+The function *findProtease* automatically maps the peptide sequences to the
+full-length protein sequence and obtains the start- and end-positions for the
+peptide. Then, the positions are searched against the MEROPs database and
+matches are returned.
 
-protein <- c("P02671", "P02671", "P68871", "P01011")
-peptide <- c("FEEVSGNVSPGTR", "FVSETESR", "LLVVYPW", "ITLLSAL")
 
-# If we do not specify start position (start_pos) and end position (end_pos),
-# the function will automatically assign these values by matching the provided
-# peptide sequence against the full-length protein sequence
-res <- findProtease(protein = protein, peptide = peptide, organism = "Homo sapiens")
+```{r FindProtease, eval = TRUE}
+
+# Create a vector of Uniprot IDs and corresponding peptide sequences
+
+protein <- c("P02671", "P02671", "P68871",
+             "P01011", "P68133", "P02461",
+             "P0DJI8", "P0DJI8", "P0DJI8")
+peptide <- c("FEEVSGNVSPGTR", "FVSETESR", "LLVVYPW",
+             "ITLLSAL", "DSYVGDEAQS", "AGGFAPYYG",
+             "FFSFLGEAFDGAR", "EANYIGSDKY", "GGVWAAEAISDAR")
+
+# If we do not specify start position (start_pos) and end position
+# (end_pos), the function will automatically assign these values by
+# matching the provided peptide sequence against the full-length
+# protein sequence.
+
+res <- findProtease(protein = protein,
+                    peptide = peptide,
+                    organism = "Homo sapiens")
 
 # The resulting S4 object can be inspected in three ways;
+# (to save space we show only the first six rows)
 
 # 1. Display sequence data for the provided input:
 
-substrates(res)
+substrates(res) |> head()
 
 # 2. Show which known proteases may have cleaved this protein:
 
-proteases(res)
+proteases(res) |> head()
 
 # 3. Display details of associated proteolytic events:
 
-cleavages(res)
+cleavages(res) |> head()
+
+# We can find out what proportion of matching cleaving events by reviewed
+# proteases occur at N- versus C-terminus
+
+cl <- cleavages(res)[`Protease status` == "reviewed"]
+
+cl$`Cleaved terminus` |> table() |> prop.table() |> round(digits = 2)
+
+# And inspect the distribution of cleaved amino acids
+
+cl$`Cleaved residue` |> table() |> barplot(cex.names = 2)
+
+
+# Find which protease is involved in the greatest number of cleaving events
+
+cl[!duplicated(Peptide), .(count = .N), by = `Protease (Uniprot)`]
+
+# If start- and end-positions are specified, the function will not attempt
+# to automatically look up sequence data for the specified protein/peptide.
+
+cl_by_pos <- findProtease(
+    protein = "P02671",
+    peptide = "FEEVSGNVSPGTR",
+    start_pos = 413,
+    end_pos = 425
+)
+
+# However, this means sequence details for substrates is not available.
+
+substrates(cl_by_pos)
+
 
 
 ```
 
 ## Look up a protease on MEROPS
 
+We may want to read up on the details of an entry directly in MEROPS.
+The function *browseProtease* takes a UniProt or MEROPS ID and opens the 
+MEROPS summary page which corresponds to that ID in a web browser.
+
 ```{r Browse protease, eval = FALSE}
 
-# browseProtease("P07339", keytype = "UniprotID") # (opens web browser)
+browseProtease("P07339", keytype = "UniprotID") # (opens web browser)
 
 ```
 
+# Additional examples
+
+## Plot cleavages as a protein-protein interaction network.
+
+```{r network, eval = TRUE, message = FALSE, fig.height = 12, fig.width = 12}
+
+library(igraph)
+library(data.table)
+
+# Make a vector of substrates we want to investigate
+proteins <- c('P01011','P02671')
+
+# Look up known proteases which cleave these substrates, and associated data
+# annotated to the cleaving events
+res <- searchSubstrate(protein = proteins, summarize = FALSE)
+
+# Filter to keep proteases with Uniprot status "reviewed"
+res <- res[`Protease status` == "reviewed"]
+
+# To create a network, we only need two columns of interactors
+# i.e. the proteases with cleaving action on the substrates
+res <- res[, c("Protease (Uniprot)", "Substrate (Uniprot)", "Cleavage type")]
+
+# Construct the DAG
+g <- igraph::graph_from_data_frame(res,
+                                   directed = TRUE,
+                                   vertices = unique(
+                                       c(res$`Protease (Uniprot)`,
+                                         res$`Substrate (Uniprot)`)))
+
+# This will allow us to return to a layout we like
+# (and where the legend fits nicely)
+set.seed(104)
+
+plot(g,
+     vertex.label.family = "Helvetica",
+     vertex.size = 14,
+     vertex.color = ifelse(V(g)$name %in% res$`Protease (Uniprot)`,
+                           "#377EB8", "#E41A1C"),
+     vertex.label.cex = 1,
+     vertex.label.color = "white",
+     edge.arrow.size = .6,
+     edge.color =  ifelse(E(g)$`Cleavage type` == "physiological",
+                          "#01665E", "#8E0152"),
+     layout = igraph::layout.davidson.harel)
+
+legend(title = "Nodes", cex = 2, horiz = FALSE,
+       title.adj = 0.0, inset = c(0.0, 0.2),
+       "bottomleft", bty = "n",
+       legend = c("Protease", "Substrate"),
+       fill = c("#377EB8", "#E41A1C"), border = NA)
+
+legend(title = "Edges", cex = 2, horiz = FALSE,
+       title.adj = 0.0, inset = c(0.0, 0.0),
+       "bottomleft", bty = "n",
+       legend = c("Physiological", "Non-physiological"),
+       fill = c("#01665E", "#8E0152"), border = NA)
+
+```
 
 # Session Information
 
-```{r sessioninfo, echo=FALSE}
+```{r sessioninfo, echo = FALSE}
 sessionInfo()
 ```

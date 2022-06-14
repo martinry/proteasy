@@ -9,14 +9,16 @@ searchSubstrate(protein, summarize = FALSE)
 \arguments{
 \item{protein}{a vector of corresponding UniProt Accession IDs.}
 
-\item{summarize}{if false (default), provides a detailed table of all associated cleaving events,
-otherwise outputs a summarized table and only includes reviewed (Uniprot) entries.}
+\item{summarize}{if false (default), provides a detailed table of all
+associated cleaving events, otherwise outputs a summarized table and only
+includes reviewed (Uniprot) entries.}
 }
 \value{
 data.table, character
 }
 \description{
-Given a vector of proteins, finds known proteases acting on cleavage sites.
+Given a vector of proteins, finds known proteases acting on
+cleavage sites.
 }
 \examples{
 protein <- c("P05067", "P68871")

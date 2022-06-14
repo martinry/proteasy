@@ -13,12 +13,14 @@
 #' @examples
 #' protein <- c("P02671", "P02671", "P68871", "P01011")
 #' peptide <- c("FEEVSGNVSPGTR", "FVSETESR", "LLVVYPW", "ITLLSAL")
-#' res <- findProtease(protein = protein, peptide = peptide, organism = "Homo sapiens")
+#' res <- findProtease(protein = protein, peptide = peptide,
+#' organism = "Homo sapiens")
 #' proteases(res)
 #' @return A `data.table` object.
 #' @rdname proteases
 #' @exportMethod proteases
-setMethod( f = "proteases", signature = "Cleavages", definition = function( x ) return( x@protease ))
+setMethod( f = "proteases", signature = "Cleavages",
+           definition = function( x ) return( x@protease ))
 
 #' @name substrates
 #' @title Access resulting object from `findProteases` function.
@@ -29,12 +31,14 @@ setMethod( f = "proteases", signature = "Cleavages", definition = function( x ) 
 #' @examples
 #' protein <- c("P02671", "P02671", "P68871", "P01011")
 #' peptide <- c("FEEVSGNVSPGTR", "FVSETESR", "LLVVYPW", "ITLLSAL")
-#' res <- findProtease(protein = protein, peptide = peptide, organism = "Homo sapiens")
+#' res <- findProtease(protein = protein, peptide = peptide,
+#' organism = "Homo sapiens")
 #' substrates(res)
 #' @return A `data.table` object.
 #' @rdname substrates
 #' @exportMethod substrates
-setMethod( f = "substrates", signature = "Cleavages", definition = function( x ) return( x@substrate ))
+setMethod( f = "substrates", signature = "Cleavages",
+           definition = function( x ) return( x@substrate ))
 
 #' @name cleavages
 #' @title Access resulting object from `findProteases` function.
@@ -45,9 +49,11 @@ setMethod( f = "substrates", signature = "Cleavages", definition = function( x )
 #' @examples
 #' protein <- c("P02671", "P02671", "P68871", "P01011")
 #' peptide <- c("FEEVSGNVSPGTR", "FVSETESR", "LLVVYPW", "ITLLSAL")
-#' res <- findProtease(protein = protein, peptide = peptide, organism = "Homo sapiens")
+#' res <- findProtease(protein = protein, peptide = peptide,
+#' organism = "Homo sapiens")
 #' cleavages(res)
 #' @return A `data.table` object.
 #' @rdname cleavages
 #' @exportMethod cleavages
-setMethod( f = "cleavages", signature = "Cleavages", definition = function( x ) return( x@cleavage ))
+setMethod( f = "cleavages", signature = "Cleavages",
+           definition = function( x ) return( x@cleavage ))

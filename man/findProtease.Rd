@@ -9,23 +9,29 @@ findProtease(protein, peptide, organism, start_pos, end_pos)
 \arguments{
 \item{protein}{a vector of UniProt Accession IDs.}
 
-\item{peptide}{a vector of amino acid sequences corresponding to the proteins.}
+\item{peptide}{a vector of amino acid sequences corresponding to the
+proteins.}
 
 \item{organism}{name of organism.}
 
-\item{start_pos}{(optional) numeric vector of N-terminus positions in protein sequence.}
+\item{start_pos}{(optional) numeric vector of N-terminus positions in
+protein sequence.}
 
-\item{end_pos}{(optional) numeric vector of C-terminus positions in protein sequence.}
+\item{end_pos}{(optional) numeric vector of C-terminus positions in
+protein sequence.}
 }
 \value{
 S4 object Cleavages
 }
 \description{
-Given a vector of peptides and proteins, finds known proteases acting on cleavage sites.
+Given a vector of peptides and proteins,
+finds known proteases acting on cleavage sites.
 }
 \examples{
 protein <- c("P02671", "P02671", "P68871", "P01011")
 peptide <- c("FEEVSGNVSPGTR", "FVSETESR", "LLVVYPW", "ITLLSAL")
-res <- findProtease(protein = protein, peptide = peptide, organism = "Homo sapiens")
+res <- findProtease(protein = protein,
+                    peptide = peptide,
+                    organism = "Homo sapiens")
 
 }

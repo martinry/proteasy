@@ -4,13 +4,16 @@
 \alias{searchProtease}
 \title{Show Cleaving Data for a Peptidase or Inhibitor by Uniprot accession}
 \usage{
-searchProtease(protein, summarize = FALSE)
+searchProtease(protein, organism = "Homo sapiens", summarize = FALSE)
 }
 \arguments{
 \item{protein}{a vector of corresponding UniProt Accession IDs.}
 
-\item{summarize}{if false (default), provides a detailed table of all associated cleaving events,
-otherwise outputs a summarized table and only includes reviewed (Uniprot) entries.}
+\item{organism}{name of organism.}
+
+\item{summarize}{if false (default), provides a detailed table of all
+associated cleaving events, otherwise outputs a summarized table and only
+includes reviewed (Uniprot) entries.}
 }
 \value{
 data.table, character
