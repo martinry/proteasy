@@ -228,36 +228,28 @@ browseProtease("P07339", keytype = "UniprotID") # (opens web browser)
 Here we visualize the cleaving events of two substrates as a protein-protein
 interaction network between substrates (red) and associated proteases (blue).
 
-```{r network, eval = TRUE, message = FALSE, fig.height = 12, fig.width = 12, crop = NULL}
-
+```{r network, eval = TRUE, message = FALSE, fig.height = 12, fig.width = 12, crop = FALSE}
 library(igraph)
 library(data.table)
-
 # Make a vector of substrates we want to investigate
 proteins <- c('P01011','P02671')
-
 # Look up known proteases which cleave these substrates, and associated data
 # annotated to the cleaving events
 res <- searchSubstrate(protein = proteins, summarize = FALSE)
-
 # Filter to keep proteases with Uniprot status "reviewed"
 res <- res[`Protease status` == "reviewed"]
-
 # To create a network, we only need two columns of interactors
 # i.e. the proteases with cleaving action on the substrates
 res <- res[, c("Protease (Uniprot)", "Substrate (Uniprot)", "Cleavage type")]
-
 # Construct the DAG
 g <- igraph::graph_from_data_frame(res,
                                    directed = TRUE,
                                    vertices = unique(
                                        c(res$`Protease (Uniprot)`,
                                          res$`Substrate (Uniprot)`)))
-
 # This will allow us to return to a layout we like
 # (and where the legend fits nicely)
 set.seed(104)
-
 plot(g,
      vertex.label.family = "Helvetica",
      vertex.size = 14,
@@ -269,32 +261,33 @@ plot(g,
      edge.color =  ifelse(E(g)$`Cleavage type` == "physiological",
                           "#01665E", "#8E0152"),
      layout = igraph::layout.davidson.harel)
-
 legend(title = "Nodes", cex = 2, horiz = FALSE,
        title.adj = 0.0, inset = c(0.0, 0.2),
        "bottomleft", bty = "n",
        legend = c("Protease", "Substrate"),
        fill = c("#377EB8", "#E41A1C"), border = NA)
-
 legend(title = "Edges", cex = 2, horiz = FALSE,
        title.adj = 0.0, inset = c(0.0, 0.0),
        "bottomleft", bty = "n",
        legend = c("Physiological", "Non-physiological"),
        fill = c("#01665E", "#8E0152"), border = NA)
-
 ```
 
 ## Annotated sequence similarity heatmaps
 
+`r BiocStyle::Biocpkg("proteasy")` automatically finds protein sequences 
+from protein IDs (thanks to `r BiocStyle::Biocpkg("ensembldb")` and
+`r BiocStyle::Biocpkg("Rcpi")`). We can use *substrates()* to access them.
+Here, we look study similarity matrices of some protein- and peptide-level
+sequences and plot them as heatmaps, which we annotate with cleavage data.
 
-
-```{r, message = FALSE, warning = FALSE}
+```{r, message = FALSE, warning = FALSE, crop = FALSE}
 
 # Load additional libraries
 
 library(Rcpi)
-library(ComplexHeatmap)
 library(viridis)
+suppressPackageStartupMessages(library(ComplexHeatmap))
 
 # Prepare input: protein and associated peptide sequences
 
