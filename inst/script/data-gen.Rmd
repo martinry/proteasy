@@ -100,5 +100,11 @@ R command.
     merops_map$`Protease organism %<>% sub(" \\(.*", "", .)
     ```
 
-9. The resulting object was was written as a compressed tab-separated file
+9. Only organisms ("Protease organism) which exist in mer$`Substrate organism` were kept.
+
+    ```{r, eval = FALSE}
+    merops_map %<>% .[`Protease organism` %in% unique(mer$`Substrate organism`)]
+    ```
+
+10. The resulting object was was written as a compressed tab-separated file
 named **merops_map.tab.gz**.
