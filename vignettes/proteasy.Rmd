@@ -6,8 +6,7 @@ output:
   BiocStyle::html_document:
     toc_float: true
 vignette: >
-  %\VignetteIndexEntry{Using proteasy to retrieve proteases acting
-  on cleavage sites}
+  %\VignetteIndexEntry{Using proteasy to Retrieve and Analyze Protease Data}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteKeywords{Proteomics, Bioinformatics,
   Cleavage, Polypeptides, MEROPS, Proteases}
@@ -20,8 +19,6 @@ library(BiocStyle)
 BiocStyle::markdown()
 
 ```
-
-
 
 # Introduction
 
