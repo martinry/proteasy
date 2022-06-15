@@ -228,7 +228,7 @@ browseProtease("P07339", keytype = "UniprotID") # (opens web browser)
 Here we visualize the cleaving events of two substrates as a protein-protein
 interaction network between substrates (red) and associated proteases (blue).
 
-```{r network, eval = TRUE, message = FALSE, fig.height = 12, fig.width = 12}
+```{r network, eval = TRUE, message = FALSE, fig.height = 12, fig.width = 12, crop = NULL}
 
 library(igraph)
 library(data.table)
