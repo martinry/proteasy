@@ -31,7 +31,10 @@ Suggests:
     BiocStyle,
     knitr,
     rmarkdown,
-    igraph
+    igraph,
+    ComplexHeatmap,
+    viridis,
+    magick
 License: GPL-3
 LazyData: false
 VignetteBuilder: knitr

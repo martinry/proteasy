@@ -22,22 +22,49 @@ BiocStyle::markdown()
 
 # Introduction
 
+## Motivation
+
+Protease cleavages affect many vital physiological processes, and dysregulation
+of proteolytic activity is associated with a variety of pathological
+conditions. The field of degradomics is committed to provide insights about
+proteolytic events by incorporating techniques for identification and
+functional characterization of proteases and their substrates and inhibitors.
+
+`r BiocStyle::Biocpkg("proteasy")` allows for batch identification of possible
+proteases for a set of substrates (protein IDs and peptide sequences), and may
+be an important tool in peptide-centric analyses of endogenously cleaved
+peptides.
+
 This package utilizes data derived from the
 [MEROPS database](https://www.ebi.ac.uk/merops/).
 The database is a manually curated knowledgebase with information about
-proteolytic enzymes (proteases), their inhibitors and substrates. 
+proteolytic enzymes, their inhibitors and substrates. 
+
+This document illustrates the functionality of proteasy through some use cases.
+
+## Package scope and limitations
 
 Similarly to existing tools such as
 [TopFind](https://topfind.clip.msl.ubc.ca/), and
 [Proteasix](http://www.proteasix.org), `r BiocStyle::Biocpkg("proteasy")`
-exists for the purpose of retrieving data on proteolytic enzymes by mapping
-peptide termini to known sites where a protease cleaves. Unlike the
+exists for the purpose of retrieving data about proteases by mapping peptide
+termini positions to known sites where a protease cleaves. Unlike the
 `r BiocStyle::Biocpkg("cleaver")` package, which allows for in-silico cleavage
 of amino acid sequences by specifying an enzyme, the functions in
 `r BiocStyle::Biocpkg("proteasy")` relies only on experimentally derived data
 to find proteases annotated to cleavage sites.
 
-This document illustrates the functionality of proteasy through some use cases.
+The `r BiocStyle::Biocpkg("proteasy")` package is limited to entries annotated
+in MEROPS. Moreover, `r BiocStyle::Biocpkg("proteasy")` currently does not
+allow for retrieval of proteolytic details for multiple organisms at once, or
+inter-organism events. The package does however provide annotation data for all
+organisms available in MEROPS.
+
+The function findProtease will automatically map a peptide's start- and end-
+positions in its host-protein's sequence. When a protein sequence has repeated
+instances of a peptide sequence, `r BiocStyle::Biocpkg("proteasy")` will 
+only match to the first instance in the protein sequence.
+
 
 # Installation
 
@@ -62,10 +89,10 @@ library("proteasy")
 
 # Usage
 
-## Find known proteases by substrate search
+## Find proteases by substrate search
 
-A fast way to find which proteases, if any, are annotated as cleaving actors
-for a substrate is by using the function *searchSubstrate*. Setting the 
+A fast way to find which possible proteases, if any, are annotated as cleaving
+actors for a substrate is by using the function *searchSubstrate*. Setting the 
 parameter summarize = TRUE will return only a vector of reviewed proteases,
 and summarize = FALSE will return a table with details about each cleaving
 event. We will explore the two options for kininogen-1 (P01042).
@@ -198,6 +225,9 @@ browseProtease("P07339", keytype = "UniprotID") # (opens web browser)
 
 ## Plot cleavages as a protein-protein interaction network.
 
+Here we visualize the cleaving events of two substrates as a protein-protein
+interaction network between substrates (red) and associated proteases (blue).
+
 ```{r network, eval = TRUE, message = FALSE, fig.height = 12, fig.width = 12}
 
 library(igraph)
@@ -253,6 +283,99 @@ legend(title = "Edges", cex = 2, horiz = FALSE,
        fill = c("#01665E", "#8E0152"), border = NA)
 
 ```
+
+## Annotated sequence similarity heatmaps
+
+
+
+```{r, message = FALSE, warning = FALSE}
+
+# Load additional libraries
+
+library(Rcpi)
+library(ComplexHeatmap)
+library(viridis)
+
+# Prepare input: protein and associated peptide sequences
+
+protein <- c('P01011','P01011','P01034','P01034',
+             'P01042','P02671','P02671','P68871',
+             'P68871','P01042')
+
+peptide <- c('LVETRTIVRFNRPFLMIIVPTDTQNIFFMSKVTNPK','ITLLSAL',
+             'KAFCSFQIY','AFCSFQIY','DIPTNSPELEETLTHTITKL','FEEVSGNVSPGTR',
+             'FVSETESR','LLVVYPW','VDEVGGEALGR','KIYPTVNCQPLGMISLM')
+
+# Find cleaving data associated with above substrates
+
+res <- findProtease(protein = protein,
+                    peptide = peptide,
+                    organism = "Homo sapiens")
+
+# Get substrate info
+
+ss <- substrates(res)
+
+# Show only unique sequences
+
+ss_uniq <- ss[!duplicated(`Substrate sequence`)]
+
+# Calculate protein (substrate) sequence similarity
+
+psimmat = Rcpi::calcParProtSeqSim(ss_uniq$`Substrate sequence`,
+                                  type = 'global',
+                                  submat = 'BLOSUM62')
+
+rownames(psimmat) <- colnames(psimmat) <- ss_uniq$`Substrate (Uniprot)`
+
+# Plot as a heatmap
+
+ComplexHeatmap::Heatmap(psimmat, col = viridis::mako(100))
+
+# We can do the same thing for peptide sequences,
+# and annotate each row (cleaved peptide) with
+# information about cleaved residue and termini
+
+# Get cleavage details
+
+cl <- cleavages(res)
+
+# Calculate peptide sequence similarity
+
+pep_psimmat = Rcpi::calcParProtSeqSim(cl$Peptide, type = 'global',
+                                      submat = 'BLOSUM62')
+
+# Right side annotation: cleaved residue
+
+rsd <- cl$`Cleaved residue`
+cols <- c("#8DD3C7", "#FFFFB3", "#BEBADA", "#FB8072")
+names(cols) <- unique(rsd)
+ha1 <- ComplexHeatmap::columnAnnotation(`cleaved residue` = rsd,
+                         col = list(`cleaved residue` = cols))
+
+# Right side annotation: Terminus
+
+tn <- cl$`Cleaved terminus`
+cols <- c("#B3E2CD", "#FDCDAC")
+names(cols) <- unique(tn)
+ha2 <- ComplexHeatmap::columnAnnotation(terminus = tn,
+                     col = list(terminus = cols))
+
+rownames(pep_psimmat) <- cl$`Substrate (Uniprot)`
+
+# Plot as a heatmap
+
+ComplexHeatmap::Heatmap(
+    pep_psimmat,
+    name = "sequence\nsimilarity",
+    col = viridis::mako(100),
+    show_column_names = FALSE,
+    row_names_gp = grid::gpar(fontsize = 6.5),
+    top_annotation = c(ha1, ha2)
+)
+
+```
+
 
 # Session Information
 
