@@ -26,8 +26,7 @@ Imports:
     EnsDb.Rnorvegicus.v79,
     Rcpi,
     methods,
-    utils,
-    R.utils
+    utils
 Suggests:
     BiocStyle,
     knitr,
@@ -35,6 +34,7 @@ Suggests:
     igraph,
     ComplexHeatmap,
     viridis,
+    R.utils
 License: GPL-3
 LazyData: false
 VignetteBuilder: knitr
