@@ -18,7 +18,6 @@
 #' searchSubstrate(protein = protein)
 #'
 #' @importFrom data.table data.table
-#' @import R.utils
 #'
 #' @export
 

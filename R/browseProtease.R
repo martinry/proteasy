@@ -18,8 +18,6 @@
 #' }
 #' @return utils::browseURL
 #'
-#' @import R.utils
-#'
 #' @export
 
 browseProtease <- function(p, keytype = "UniprotID") {
