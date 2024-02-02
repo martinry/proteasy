@@ -25,6 +25,7 @@
 #'                     organism = "Homo sapiens")
 #'
 #' @importFrom data.table data.table
+#' @import R.utils
 #'
 #' @export
 
@@ -41,16 +42,16 @@ findProtease <- function(protein, peptide,
     # Internal data: MEROPS Substrate_search.sql and
     # Uniprot ID to MEROPS identifier mapping
     mer <- data.table::fread(
-        system.file("extdata", "mer.tab.gz", package = "proteasy"))
+        "C:/Users/ryden/proteasy/inst/extdata/mer.tab.gz")
     merops_map <- data.table::fread(
-        system.file("extdata", "merops.map.tab.gz", package = "proteasy"))
+        "C:/Users/ryden/proteasy/inst/extdata/merops.map.tab.gz")
+    
+    unique_proteins <- unique(protein)
 
     if(!(organism %in% unique(mer$`Substrate organism`))) {
         stop("Organism not recognized")
     }
     
-    unique_proteins <- unique(protein)
-
     if((missing(start_pos) | missing(end_pos))) {
         
         if(!(length(peptide) == length(protein))) {
@@ -74,6 +75,8 @@ findProtease <- function(protein, peptide,
                             protein = protein,
                             organism = organism)
         }
+        
+        
 
         # Proteins where sequence data was not found
         unmapped <- unique_proteins[!(unique_proteins %in% p$seq_name)]

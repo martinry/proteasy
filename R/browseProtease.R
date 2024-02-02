@@ -16,8 +16,9 @@
 #'
 #' }
 #' }
-#'
 #' @return utils::browseURL
+#'
+#' @import R.utils
 #'
 #' @export
 
